@@ -5,6 +5,6 @@ set -e
 if [ -n "$DEBBASE_TIMEZONE" ]; then
   echo "Setting container timezone to $DEBBASE_TIMEZONE"
   echo "$DEBBASE_TIMEZONE" > /etc/timezone
-  cp -v "/usr/share/zoneinfo/$DEBBASE_TIMEZONE" /etc/localtime
+  ln -sf "/usr/share/zoneinfo/$DEBBASE_TIMEZONE" /etc/localtime
 fi
 
