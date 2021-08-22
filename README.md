@@ -10,7 +10,7 @@ Unix APIs (including syslog, zombie process collection, etc.)
 
 Despite this, they are all very small, both in terms of disk and RAM usage.
 
-You can find a [description of the motivation for these images](http://changelog.complete.org/archives/9794-fixing-the-problems-with-docker-images) on my blog.
+You can find a [description of the motivation for these images](https://changelog.complete.org/archives/9794-fixing-the-problems-with-docker-images) on my blog.
 
 This is loosely based on the concepts, but not the code, in the
 [phusion baseimage-docker](https://github.com/phusion/baseimage-docker).
@@ -19,12 +19,12 @@ You can look at that link for additional discussion on the motivations.
 You can find the source and documentation at the [Github page](https://github.com/jgoerzen/docker-debian-base)
 and automatic builds are available from [my Docker hub page](https://hub.docker.com/u/jgoerzen/).
 
-For stretch and jessie, this image uses sysvinit instead of systemd,
+**OUDATED**: For stretch and jessie, this image uses sysvinit instead of systemd,
 not because of any particular opinion on the merits of them, but
 rather because sysvinit does not require any kind of privileged Docker
 or cgroups access.
 
-For buster, systemd contains the necessary support for running in an
+For buster and bullseye, systemd contains the necessary support for running in an
 unprivileged Docker container and, as it doesn't require the hacks
 that sysvinit does, is used there.  The systemd and sysvinit images
 provide an identical set of features and installed software, which
@@ -33,7 +33,7 @@ target the standard Linux API.
 Here are the images I provide from this repository:
 
 - [jgoerzen/debian-base-minimal](https://github.com/jgoerzen/docker-debian-base-minimal) - a minimalistic base for you.
-  - Provides working sysvinit, syslogd, cron, anacron, at, and logrotate.
+  - Provides working sysvinit/systemd, syslogd, cron, anacron, at, and logrotate.
   - syslogd is configured to output to the docker log system by default.
 - [jgoerzen/debian-base-standard](https://github.com/jgoerzen/docker-debian-base-standard) - adds some utilities.  Containes everything above, plus:
   - Utilities: less, nano, vim-tiny, man-db (for viewing manpages), net-tools, wget, curl, pwgen, zip, unzip
@@ -65,7 +65,8 @@ Memory usage at boot (stretch):
 
 These tags are autobuilt:
 
- - latest: whatever is stable (currently stretch, sysvinit)
+ - latest: whatever is stable (currently bullseye, systemd)
+ - bullseye: Debian bullseye (systemd)
  - buster: Debian buster (systemd)
  - stretch: Debian stretch (sysvinit) - **no longer supported, may be removed at any time**
  - jessie: Debian jessie (sysvinit) - **no longer supported, may be removed at any time**
@@ -90,7 +91,7 @@ also the section on environment variables, below.
 
     docker run -td --stop-signal=SIGPWR --name=name jgoerzen/debian-base-whatever
 
-## Container Invocation, systemd containers (buster/sid)
+## Container Invocation, systemd containers (buster/bullseye/sid)
 
     docker run -td --stop-signal=SIGRTMIN+3 \
       --tmpfs /run:size=100M --tmpfs /run/lock:size=100M \
@@ -141,7 +142,7 @@ If you start without `--stop-signal`, you can instead use these steps:
 
     # jessie or stretch use this line:
     docker kill -s SIGPWR container
-    # buster or sid use this one:
+    # bullseye, buster or sid use this one:
     docker kill -s SIGRTMIN+3 container
     
     # Either way, then proceed with:
@@ -149,7 +150,7 @@ If you start without `--stop-signal`, you can instead use these steps:
     docker kill container
 
 Within the container, you can call `telinit 1` (jessie/stretch) or
-`poweroff` (buster/sid) to cause the container to shutdown.
+`poweroff` (bullseye/buster/sid) to cause the container to shutdown.
 
 ## Advanted topic: Orderly Shutdown Mechanics
 
@@ -162,7 +163,7 @@ so in all.
 
 A workaround is, howerver, readily available, without modifying init.  These
 images are configured to perform a graceful shutdown upon receiving
-`SIGPWR` (jessie/stretch) or `SIGRTMIN+3` (buster/sid).
+`SIGPWR` (jessie/stretch) or `SIGRTMIN+3` (bullseye/buster/sid).
 
 The process for this with sysvinit is... interesting, since we are
 unable to directly kill PID 1 inside a docker container.  First, init
@@ -177,7 +178,7 @@ This causes PID 1 to finally exit.
 With sysvinit, one of the preinit scripts makes sure that `/sbin/init`
 properly links to `/sbin/init.real` at boot time.
 
-With systemd in buster/sid, no special code for all this is needed;
+With systemd in bullseye/buster/sid, no special code for all this is needed;
 systemd handles it internally with no fuss.
 
 # Configuration
@@ -197,7 +198,7 @@ You can enable or disable services using commands like this
     update-rc.d ssh disable 
     update-rc.d ssh enable
    
-Or this (buster/sid):
+Or this (bullseye/buster/sid):
 
     systemctl disable ssh
     systemctl enable ssh
@@ -221,7 +222,7 @@ files in `/etc/ssh` or make it a volume.
 
 # Advanced topic: programs that depend on disabled scripts (stretch/jessie only)
 
-**This section pertains only to stretch/jessie; systemd in buster/sid
+**This section pertains only to stretch/jessie; systemd in bullseye/buster/sid
   does not have these issues.**
 
 There are a number of scripts in `/etc/init.d` that are normally part

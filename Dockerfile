@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:bullseye
 MAINTAINER John Goerzen <jgoerzen@complete.org>
 # Concepts from https://github.com/phusion/baseimage-docker
 
