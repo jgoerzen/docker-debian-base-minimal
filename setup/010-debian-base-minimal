@@ -11,7 +11,6 @@ COPY () {
 # Copy files into place
 
 COPY syslog.conf /etc/syslog.conf.stdout
-COPY journald.conf /etc/systemd/journald.conf
 
 apt-get update
 apt-get -y --no-install-recommends install inetutils-syslogd cron anacron at logrotate systemd-sysv initscripts
@@ -25,3 +24,5 @@ dpkg-divert --local --divert /etc/syslog.conf.internal --rename /etc/syslog.conf
 
 # Let daemons start
 mv /usr/sbin/policy-rc.d /usr/sbin/policy-rc.d.disabled
+
+COPY journald.conf /etc/systemd/journald.conf
