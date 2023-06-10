@@ -70,7 +70,7 @@ Memory usage at boot (stretch):
 These tags are autobuilt:
 
  - latest: whatever is stable (currently bookworm, systemd)
- - bookworm: Debian bookworm (currently bookworm, systemd)
+ - bookworm: Debian bookworm (systemd)
  - bullseye: Debian bullseye (systemd)
  - buster: Debian buster (systemd) - **no longer supported, may be removed at any time**
  - stretch: Debian stretch (sysvinit) - **no longer supported, may be removed at any time**
