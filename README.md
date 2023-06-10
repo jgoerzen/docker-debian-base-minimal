@@ -19,14 +19,16 @@ This is loosely based on the concepts, but not the code, in the
 You can look at that link for additional discussion on the motivations.
 
 You can find the source and documentation at the [Salsa page](https://salsa.debian.org/jgoerzen/docker-debian-base)
-and automatic builds are available from [my Docker hub page](https://hub.docker.com/u/jgoerzen/).
+and automatic builds are available from [my Docker hub page](https://hub.docker.com/u/jgoerzen/).  The builds are auto-generated from Salsa CI and run at least weekly.
 
-**OUDATED**: For stretch and jessie, this image uses sysvinit instead of systemd,
+**OUTDATED**: For stretch and jessie, these images used sysvinit instead of systemd.  If you are still using these extremely old images, consult the [old version of documentation](https://salsa.debian.org/jgoerzen/docker-debian-base/-/blob/ff9b50581f076f35c1be2b28828c98040ce57de0/README.md) for information about them.  Newer images are systemd exclusive and the information here will be incorrect for those very old ones.
+
+The older images used sysvinit,
 not because of any particular opinion on the merits of them, but
-rather because sysvinit does not require any kind of privileged Docker
+rather because sysvinit did not require any kind of privileged Docker
 or cgroups access.
 
-For buster and bullseye, systemd contains the necessary support for running in an
+For newer releases, systemd contains the necessary support for running in an
 unprivileged Docker container and, as it doesn't require the hacks
 that sysvinit does, is used there.  The systemd and sysvinit images
 provide an identical set of features and installed software, which
@@ -34,10 +36,10 @@ target the standard Linux API.
 
 Here are the images I provide from this repository:
 
-- [jgoerzen/debian-base-minimal](https://salsa.debian.org/jgoerzen/docker-debian-base-minimal) - a minimalistic base for you.
+- [jgoerzen/debian-base-minimal](https://salsa.debian.org/jgoerzen/docker-debian-base-minimal) - a minimalistic base.
   - Provides working sysvinit/systemd, syslogd, cron, anacron, at, and logrotate.
   - syslogd is configured to output to the docker log system by default.
-- [jgoerzen/debian-base-standard](https://salsa.debian.org/jgoerzen/docker-debian-base-standard) - adds some utilities.  Containes everything above, plus:
+- [jgoerzen/debian-base-standard](https://salsa.debian.org/jgoerzen/docker-debian-base-standard) - adds some utilities.  Contains everything above, plus:
   - Utilities: less, nano, vim-tiny, man-db (for viewing manpages), net-tools, wget, curl, pwgen, zip, unzip
   - Email: exim4-daemon-light, mailx
   - Network: netcat-openbsd, socat, openssl, ssh, telnet (client)
@@ -67,9 +69,10 @@ Memory usage at boot (stretch):
 
 These tags are autobuilt:
 
- - latest: whatever is stable (currently bullseye, systemd)
+ - latest: whatever is stable (currently bookworm, systemd)
+ - bookworm: Debian bookworm (currently bookworm, systemd)
  - bullseye: Debian bullseye (systemd)
- - buster: Debian buster (systemd)
+ - buster: Debian buster (systemd) - **no longer supported, may be removed at any time**
  - stretch: Debian stretch (sysvinit) - **no longer supported, may be removed at any time**
  - jessie: Debian jessie (sysvinit) - **no longer supported, may be removed at any time**
  - sid: Debian sid (not tested; systemd)
@@ -89,23 +92,23 @@ When running, use `-t` to enable the logging to `docker logs`
 A container should be started using these commands, among others.  See
 also the section on environment variables, below.
 
-## Container Invocation, systemd containers (buster/bullseye/sid)
+## Container Invocation, systemd containers (buster/bullseye/bookworm/sid)
 
-Here's how you invoke for systemd (buster/bullseye) on a system running an older systemd on the host, with cgroups v1:
-
-    docker run -td --stop-signal=SIGRTMIN+3 \
-      --tmpfs /run:size=100M --tmpfs /run/lock:size=100M \
-      -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-      --name=name jgoerzen/debian-base-whatever
-      
-For a host running bullseye, or a newer cgroups and systemd, you have to use this:
+For a host running bullseye or bookworm, or a newer cgroups and systemd, you invoke like this:
 
     docker run -td --stop-signal=SIGRTMIN+3 \
       --tmpfs /run:size=100M --tmpfs /run/lock:size=100M \
       -v /sys/fs/cgroup:/sys/fs/cgroup:rw --cgroupns=host \
       --name=name jgoerzen/debian-base-whatever
 
-Note that the buster image has not been tested under these situations, and since bullseye is now stable, it is the recommended image for all modern deployments.
+Here's how you invoke on a system running an older systemd on the host, with cgroups v1:
+
+    docker run -td --stop-signal=SIGRTMIN+3 \
+      --tmpfs /run:size=100M --tmpfs /run/lock:size=100M \
+      -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+      --name=name jgoerzen/debian-base-whatever
+      
+bookworm is now the recommended image for all modern deployments.
 
 The `/run` and `/run/lock` tmpfs are required by systemd.  The 100M
 sets a maximum size, not a default allocation, and serves to limit the
@@ -122,11 +125,6 @@ For more information about the systemd/cgroups situation, consult these links
 - https://github.com/moby/moby/issues/42275
 - https://serverfault.com/questions/1053187/systemd-fails-to-run-in-a-docker-container-when-using-cgroupv2-cgroupns-priva/1054414#1054414
 - http://docs.podman.io/en/latest/markdown/podman-run.1.html#cgroupns-mode
-- 
-
-## Container Invocation, sysvinit containers (jessie/stretch)
-
-    docker run -td --stop-signal=SIGPWR --name=name jgoerzen/debian-base-whatever
 
 # Environment Variables
 
@@ -162,17 +160,14 @@ helps achieve an orderly shutdown.
 
 If you start without `--stop-signal`, you can instead use these steps:
 
-    # jessie or stretch use this line:
-    docker kill -s SIGPWR container
-    # bullseye, buster or sid use this one:
     docker kill -s SIGRTMIN+3 container
-    
-    # Either way, then proceed with:
+
+    # Then proceed with:
     sleep 10
     docker kill container
 
-Within the container, you can call `telinit 1` (jessie/stretch) or
-`poweroff` (bullseye/buster/sid) to cause the container to shutdown.
+Within the container, you can call `poweroff` to cause the container to
+shutdown.
 
 ## Advanted topic: Orderly Shutdown Mechanics
 
@@ -185,22 +180,10 @@ so in all.
 
 A workaround is, howerver, readily available, without modifying init.  These
 images are configured to perform a graceful shutdown upon receiving
-`SIGPWR` (jessie/stretch) or `SIGRTMIN+3` (bullseye/buster/sid).
+`SIGRTMIN+3`.
 
-The process for this with sysvinit is... interesting, since we are
-unable to directly kill PID 1 inside a docker container.  First, init
-calls `/etc/init.d/powerfail`.  The powerfail script I install simply
-tells init to go to single-user mode.  This causes it to perform an
-orderly shutdown of the daemons, and when it is done, it invokes
-`/sbin/sulogin`.  On an ordinary system, this prompts for the root
-password for single-user mode.  In this environment, we instead
-symlink /sbin/init to /bin/true, then tell init to re-exec itself.
-This causes PID 1 to finally exit.
 
-With sysvinit, one of the preinit scripts makes sure that `/sbin/init`
-properly links to `/sbin/init.real` at boot time.
-
-With systemd in bullseye/buster/sid, no special code for all this is needed;
+With systemd, no special code for all this is needed;
 systemd handles it internally with no fuss.
 
 # Configuration
@@ -214,13 +197,7 @@ generally is not, the SSH service is disabled by default.
 
 ## Enabling or Disabling Services
 
-You can enable or disable services using commands like this
-(jessie/stretch):
-
-    update-rc.d ssh disable 
-    update-rc.d ssh enable
-   
-Or this (bullseye/buster/sid):
+You can enable or disable services using commands like this:
 
     systemctl disable ssh
     systemctl enable ssh
@@ -241,40 +218,6 @@ they do not already exist.  This implies every instantiation
 of a container containing SSH will have a new random host key.
 If you want to override this, you can of course supply your own
 files in `/etc/ssh` or make it a volume.
-
-# Advanced topic: programs that depend on disabled scripts (stretch/jessie only)
-
-**This section pertains only to stretch/jessie; systemd in bullseye/buster/sid
-  does not have these issues.**
-
-There are a number of scripts in `/etc/init.d` that are normally part
-of a Debian system initialization, but fail in a Docker environment.
-They do things like set up swap space, mount filesystems, etc.  Docker
-images typically leave those scripts in place, but they are never
-called because Docker systems typically don't run a real init like
-these images do.
-
-Although calling the scripts produces nothing worse than harmless
-errors, I have disabled those scripts in these images in order to
-avoid putting useless error messages in people's log files.  In some
-very rare circumstances, this may cause installation of additional
-packages to fail due to boot script dependency ordering not working
-right.  (Again, this is very rare).
-
-I saw this happen once where a package had a long chain of
-dependencies that wound up pulling in cgmanager, which died in
-postinst complaining that its init script required `mountkernfs`.  I
-worked around this in my Dockerfile like this:
-
-    update-rc.d mountkernfs.sh defaults
-    apt-get -y --no-install-recommends offending-package
-    update-rc.d -f cgmanager remove
-    update-rc.d -f mountkernfs.sh remove
-
-Also, I have blocked systemd from accidentally being installed on the
-system.  There are a few packages that pull in systemd shims and so
-forth, so if you get errors about systemd not installing, try adding
-`rm /etc/apt/preferences.d/systemd` to your Dockerfile.
 
 # Advanced Topic: Adding these enhancements to other images
 
@@ -331,7 +274,7 @@ Some references to additional information:
 # Copyright
 
 Docker scripts, etc. are
-Copyright (c) 2017-2019 John Goerzen
+Copyright (c) 2017-2023 John Goerzen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
