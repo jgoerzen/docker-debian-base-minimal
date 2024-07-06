@@ -276,7 +276,7 @@ Some references to additional information:
 # Copyright
 
 Docker scripts, etc. are
-Copyright (c) 2017-2023 John Goerzen
+Copyright (c) 2017-2024 John Goerzen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
