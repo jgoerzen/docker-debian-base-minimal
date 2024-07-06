@@ -58,6 +58,8 @@ Here are the images I provide from this repository:
   - LetsEncrypt options: certbot, acme-tiny
 - [jgoerzen/debian-base-apache-php](https://salsa.debian.org/jgoerzen/docker-debian-base-apache-php) - debian-base-apache, plus:
   - libapache2-mod-php (mod-php5 on jessie)
+- [jgoerzen/debian-base-gemini](https://salsa.debian.org/jgoerzen/docker-debian-base-gemini) - debian-base-security, plus:
+  - molly-brown, twins, gmnhg, md2gmn, md2gemini
 
 Memory usage at boot (stretch):
 
