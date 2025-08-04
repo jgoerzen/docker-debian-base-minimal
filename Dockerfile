@@ -1,5 +1,5 @@
 FROM debian:trixie
-MAINTAINER John Goerzen <jgoerzen@complete.org>
+LABEL org.opencontainers.image.authors="John Goerzen <jgoerzen@complete.org>"
 # Concepts from https://github.com/phusion/baseimage-docker
 
 COPY setup/ /usr/local/debian-base-setup/
