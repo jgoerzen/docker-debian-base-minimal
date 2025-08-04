@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:trixie
 MAINTAINER John Goerzen <jgoerzen@complete.org>
 # Concepts from https://github.com/phusion/baseimage-docker
 
