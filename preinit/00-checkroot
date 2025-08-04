@@ -2,6 +2,7 @@
 
 set -e
 echo "Cleaning up; ignore errors here:"
-/etc/init.d/checkroot-bootclean.sh || true
+#/etc/init.d/checkroot-bootclean.sh || true
+systemd-tmpfiles --boot --clean || true
 rm -f /tmp/.clean || true
 
