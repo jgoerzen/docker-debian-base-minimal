@@ -28,3 +28,6 @@ mv /usr/sbin/policy-rc.d /usr/sbin/policy-rc.d.disabled
 COPY journald.conf /etc/systemd/journald.conf
 COPY docker-debian-base-tmp.conf /etc/tmpfiles.d/docker-debian-base-tmp.conf
 
+# suppress an error about lacking permission to mount tmpfs in a docker container
+systemctl mask tmp.mount
+
