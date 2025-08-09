@@ -61,19 +61,23 @@ Here are the images I provide from this repository:
 - [jgoerzen/debian-base-gemini](https://salsa.debian.org/jgoerzen/docker-debian-base-gemini) - debian-base-security, plus:
   - molly-brown, twins, gmnhg, md2gmn, md2gemini
 
-Memory usage at boot (stretch):
+Memory usage at boot (trixie; amd64):
 
-- jgoerzen/debian-base-minimal: 6MB
-- jgoerzen/debian-base-standard: 11MB
-- jgoerzen/debian-base-security: 11MB
+- jgoerzen/debian-base-minimal: 20MB
+- jgoerzen/debian-base-standard: 30MB
+- jgoerzen/debian-base-security: 54MB
 
 # Docker Tags
 
 These tags are autobuilt:
 
- - latest: whatever is stable (currently bookworm, systemd)
- - bookworm: Debian bookworm (systemd)
- - bullseye: Debian bullseye (systemd)
+ - latest: whatever is stable (currently trixie, systemd)
+ - trixie: Debian trixie (systemd)
+
+These tags exist historically:
+
+ - bookworm: Debian bookworm (systemd) - **no longer supported, may be removed at any time**
+ - bullseye: Debian bullseye (systemd) - **no longer supported, may be removed at any time**
  - buster: Debian buster (systemd) - **no longer supported, may be removed at any time**
  - stretch: Debian stretch (sysvinit) - **no longer supported, may be removed at any time**
  - jessie: Debian jessie (sysvinit) - **no longer supported, may be removed at any time**
@@ -94,9 +98,9 @@ When running, use `-t` to enable the logging to `docker logs`
 A container should be started using these commands, among others.  See
 also the section on environment variables, below.
 
-## Container Invocation, systemd containers (buster/bullseye/bookworm/sid)
+## Container Invocation, systemd containers (buster or newer)
 
-For a host running bullseye or bookworm, or a newer cgroups and systemd, you invoke like this:
+For a host running bullseye or newer, or a newer cgroups and systemd, you invoke like this:
 
     docker run -td --stop-signal=SIGRTMIN+3 \
       --tmpfs /run:size=100M --tmpfs /run/lock:size=100M \
@@ -276,7 +280,7 @@ Some references to additional information:
 # Copyright
 
 Docker scripts, etc. are
-Copyright (c) 2017-2024 John Goerzen
+Copyright (c) 2017-2025 John Goerzen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
